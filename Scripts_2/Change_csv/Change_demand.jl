@@ -2,10 +2,10 @@ using CSV
 using DataFrames
 
 # Leer el archivo CSV
-df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/demand.csv", DataFrame)
+df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/variable_capacity_factors.csv", DataFrame)
 
-# Multiplicar cada valor de la columna 'zone_demand_mw' por 0.930569
-df[:,3:end] .*= 0.930569
+# Filtrar filas donde la columna 'TIMEPOINT' comience con '2023'
+df = filter(row -> occursin("2023", string(row.timepoint)), df)
 
-# guardar archivo
-CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/demanda.csv", df)
+# Guardar el archivo
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/variable_capacity_factors2.csv", df)

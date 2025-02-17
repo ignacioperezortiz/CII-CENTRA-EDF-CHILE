@@ -23,7 +23,7 @@ for year in ["2024", "2026", "2029", "2030", "2031", "2033", "2040", "2050"]
 end
 
 # Llenar la fila "Energía total demandada (GWh)" con 
-df_demanda = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/outputs/electricity_cost.csv", DataFrame)
+df_demanda = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/electricity_cost.csv", DataFrame)
 for row in eachrow(df_demanda)
     period = string(row.PERIOD)
     if period in names(df)
@@ -36,7 +36,7 @@ end
 # println(df)
 
 # Llenar columna Emisiones CO2 anual
-Emissions_DF = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/outputs/emissions.csv", DataFrame)
+Emissions_DF = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/emissions.csv", DataFrame)
 
 # Asignar valores de Emissions_DF a df
 for row in eachrow(Emissions_DF)
@@ -50,7 +50,7 @@ end
 # println(df)
 
 # Llenar columna Energía movida por BESS
-dispatch_annual_summary = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/outputs/dispatch_annual_summary.csv", DataFrame)
+dispatch_annual_summary = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/dispatch_annual_summary.csv", DataFrame)
 
 # Filtrar el DataFrame para obtener solo las filas donde gen_tech es "ESS"
 filtered_dispatch = filter(row -> row.gen_tech == "ESS", dispatch_annual_summary)
@@ -165,9 +165,9 @@ for period in unique(filtered_dispatch6.period)
 end
 
 # Lectura de archivos
-df_dispatch = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/outputs/DispatchGen.csv", DataFrame)
-df_limits = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/inputs/variable_capacity_factors.csv", DataFrame)
-df_genbuild = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/outputs/dispatch_gen_annual_summary.csv", DataFrame)
+df_dispatch = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/DispatchGen.csv", DataFrame)
+df_limits = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/variable_capacity_factors.csv", DataFrame)
+df_genbuild = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/dispatch_gen_annual_summary.csv", DataFrame)
 
 # Trabajo de archivo dispatch para que solo hayan renovables variables
 unicue = unique(df_limits.GENERATION_PROJECT)
@@ -190,7 +190,7 @@ end
 
 # Añadir la columna de capacidad instalada al dataframe df_dispatch2
 df_dispatch2[:, :Installed_Capacity_MW] = [capacity_dict[row[:GEN_TPS_1]][string(row[:GEN_TPS_2])[1:4]] for row in eachrow(df_dispatch2)]
-
+# println(df_dispatch2[16000:17000,:])
 # Crear un diccionario para almacenar el factor de capacidad máxima por generador y punto de tiempo
 capacity_factor_dict = Dict{String, Dict{String, Float64}}()
 
@@ -211,7 +211,6 @@ df_dispatch2[:, :Max_Capacity_Factor] = [capacity_factor_dict[row[:GEN_TPS_1]][s
 
 # Añadir la columna de potencial de generación
 df_dispatch2[:, :Generation_Potential] = df_dispatch2[:, :Installed_Capacity_MW] .* df_dispatch2[:, :Max_Capacity_Factor]
-
 # Añadir la columna de recortes
 df_dispatch2[:, :Recortes] = df_dispatch2[:, :Generation_Potential].- df_dispatch2[:,:DispatchGen]
 
@@ -246,7 +245,7 @@ df_potencial_generacion_totales[:, :GEN_TPS_2] = [string(row[:año]) * lpad(stri
 
 # df_recortes_diarios
 # Leer el archivo timeseries.csv
-df_timeseries = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/inputs/timeseries.csv", DataFrame)
+df_timeseries = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/timeseries.csv", DataFrame)
 # df_timeseries[:, :TIMESERIES] = string.(df_timeseries[:, :TIMESERIES])
 # Crear una nueva columna en df_recortes_diarios para ts_scale_to_period
 df_recortes_diarios[:, :ts_scale_to_period] = Vector{Float64}(undef, nrow(df_recortes_diarios))
@@ -307,13 +306,16 @@ for period in unique(df_recortes_anuales.año)
 end
 
 for period in unique(df_recortes_anuales.año)
+    total_discharge = sum(filtered_dispatch6[filtered_dispatch6.period .== period, :Energy_GWh_typical_yr])
+    total_energy = sum(df_anual_summary3[df_anual_summary3.period .== period, :Energy_GWh_typical_yr])
+    total_gen = sum(df_anual_summary3[df_anual_summary3.period .== period, :Energy_GWh_typical_yr])
     Total_Recortes_Anuales = df_recortes_anuales.Total_Recortes_Anuales[findfirst(x -> x==period, df_recortes_anuales.año)]
     generacion_potencial_anuales = df_generacion_potencial_anuales.Total_Potencial_generacion_Anuales[findfirst(x -> x==period, df_generacion_potencial_anuales.año)]
     if string(period) in names(df)
-        df[df.Item .== "Recortes %", Symbol(string(period))] .= (Total_Recortes_Anuales./(generacion_potencial_anuales)).*100
+        df[df.Item .== "Recortes %", Symbol(string(period))] .= (Total_Recortes_Anuales./((total_discharge/total_energy).*total_gen).*100)
     end
 end
 
 println(df)
 
-CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/TA/Tabla_Resultados_Energeticos.csv", df)
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Tabla_Resultados_Energeticos.csv", df)
