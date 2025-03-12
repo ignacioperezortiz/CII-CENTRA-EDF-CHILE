@@ -1,5 +1,8 @@
+# Script para generar un vector con un resumen de costos totales de planificación para cada escenario, diferenciado por item
 using CSV
 using DataFrames
+
+df_fuente = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase/RL/outputs/cost_components.csv", DataFrame)
 
 function calculate_present_value(future_value, discount_rate, years)
     return future_value / ((1 + discount_rate) ^ years)
@@ -71,10 +74,20 @@ ess_technologys = ["Bomb", "CAES", "TES", "ESS"]
 
 ldes_npv = sum(npv_dict[tech] for tech in ldes_technologies if haskey(npv_dict, tech))
 ess_npv = get(npv_dict, ess_technology, 0.0)
-gens_npv = sum(npv_dict[tech] for tech in keys(npv_dict) if tech != ess_technologys)
+gens_npv = sum(npv_dict[tech] for tech in keys(npv_dict) if !(tech in ess_technologys))
 
 # Print the NPV for each category and the total NPV
 println("The NPV for LDES is $ldes_npv million USD.")
 println("The NPV for ESS is $ess_npv million USD.")
 println("The NPV for Gens is $gens_npv million USD.")
 println("The total NPV across all categories is $(ess_npv + gens_npv + ldes_npv) million USD.")
+
+df_fuente.npv_cost = df_fuente.npv_cost./1000000
+
+push!(df_fuente, ("Ldes_nvp", ldes_npv))
+push!(df_fuente, ("ess_npv", ess_npv))
+push!(df_fuente, ("gens_npv", gens_npv))
+
+println(df_fuente)
+
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase/RL/NVP_costs.csv", df_fuente)
