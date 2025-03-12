@@ -4,9 +4,9 @@ using CairoMakie
 using Statistics
 
 # Leer los archivos CSV
-df_RL = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Sensibilidades/OK/CasoBase/RL/inputs/gen_build_costs.csv", DataFrame)
-df_CN = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Sensibilidades/OK/CasoBase/CN/inputs/gen_build_costs.csv", DataFrame)
-df_TA = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Sensibilidades/OK/CasoBase/TA/inputs/gen_build_costs.csv", DataFrame)
+df_RL = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/Costos_BESS_A5/RL/inputs/gen_build_costs.csv", DataFrame)
+df_CN = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/Costos_BESS_A5/CN/inputs/gen_build_costs.csv", DataFrame)
+df_TA = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/Costos_BESS_A5/TA/inputs/gen_build_costs.csv", DataFrame)
 
 # Función para procesar cada DataFrame
 function process_df(df)
@@ -22,6 +22,7 @@ function process_df(df)
     result_df.multiplier = result_df.avg_cost ./ first_avg_cost
     result_df.percentage = vcat([0], fill(5, nrow(result_df) - 1))
     n_periods = nrow(result_df)
+    # println(n_periods)
     increment_5 = 1.0 .+ (0:n_periods-1) .* (0.05 / (n_periods-1))
     decrement_5 = 1.0 .- (0:n_periods-1) .* (0.05 / (n_periods-1))
     increment_8 = 1.0 .+ (0:n_periods-1) .* (0.08 / (n_periods-1))
@@ -30,6 +31,8 @@ function process_df(df)
     result_df.avg_cost_decrease = result_df.avg_cost .* decrement_5
     result_df.avg_cost_increase_8 = result_df.avg_cost .* increment_8
     result_df.avg_cost_decrease_8 = result_df.avg_cost .* decrement_8
+    println(result_df.avg_cost_increase[7])
+    println(result_df.avg_cost[7])
     return result_df
 end
 
@@ -52,19 +55,19 @@ ax = Axis(fig[1, 1],
 xlims!(ax, minimum(result_df_RL.period.-2000), maximum(result_df_RL.period.-2000))
 
 # Plotear las líneas para RL
-lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost/4, label = "Costos Base RL", color = :red, linestyle = :solid, linewidth = 2)
-lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost_increase/4, label = "Aumento Costos 5% RL", color = :red, linestyle = :dash, linewidth = 2)
-lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost_decrease/4, label = "Disminución Costos 5% RL", color = :red, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost, label = "Costos Base RL", color = :red, linestyle = :solid, linewidth = 2)
+lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost_increase, label = "Aumento Costos 5% RL", color = :red, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_RL.period.-2000, result_df_RL.avg_cost_decrease, label = "Disminución Costos 5% RL", color = :red, linestyle = :dash, linewidth = 2)
 
 # Plotear las líneas para CN
-lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost/4, label = "Costos Base CN", color = :blue, linestyle = :solid, linewidth = 2)
-lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost_increase/4, label = "Aumento Costos 5% CN", color = :blue, linestyle = :dash, linewidth = 2)
-lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost_decrease/4, label = "Disminución Costos 5% CN", color = :blue, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost, label = "Costos Base CN", color = :blue, linestyle = :solid, linewidth = 2)
+lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost_increase, label = "Aumento Costos 5% CN", color = :blue, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_CN.period.-2000, result_df_CN.avg_cost_decrease, label = "Disminución Costos 5% CN", color = :blue, linestyle = :dash, linewidth = 2)
 
 # Plotear las líneas para TA
-lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost/4, label = "Costos Base TA", color = :green, linestyle = :solid, linewidth = 2)
-lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost_increase/4, label = "Aumento Costos 5% TA", color = :green, linestyle = :dash, linewidth = 2)
-lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost_decrease/4, label = "Disminución Costos 5% TA", color = :green, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost, label = "Costos Base TA", color = :green, linestyle = :solid, linewidth = 2)
+lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost_increase, label = "Aumento Costos 5% TA", color = :green, linestyle = :dash, linewidth = 2)
+lines!(ax, result_df_TA.period.-2000, result_df_TA.avg_cost_decrease, label = "Disminución Costos 5% TA", color = :green, linestyle = :dash, linewidth = 2)
 
 # Añadir leyenda fuera del gráfico, a la derecha y reducir el tamaño de la simbología
 legend = Legend(fig, ax, "Simbología", title = "Proyecciones", fontsize = 8)
@@ -72,4 +75,4 @@ fig[1, 2] = legend
 
 # Mostrar el gráfico
 display(fig)
-save("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/CII-CENTRA-EDF-CHILE/Scripts_2/Plot_inputs/BESS_Costs_Sensibility.png", fig)
+# save("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/CII-CENTRA-EDF-CHILE/Scripts_2/Plot_inputs/BESS_Costs_Sensibility.png", fig)
