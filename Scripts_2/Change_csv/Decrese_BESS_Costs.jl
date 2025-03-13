@@ -16,7 +16,7 @@ function process_df(df)
     first_avg_cost = result_df.avg_cost[1]
     result_df.multiplier = result_df.avg_cost ./ first_avg_cost
     n_periods = nrow(result_df)
-    decrement_5 = 1.0 .- (0:n_periods-1) .* (0.05 / (n_periods-1))
+    decrement_5 = 1.0 .+ (0:n_periods-1) .* (0.05 / (n_periods-1))
     result_df.avg_cost_decrease = result_df.avg_cost .* decrement_5
     return result_df
 end
@@ -41,9 +41,9 @@ function update_csv(file_path, result_df)
 end
 
 # Leer los archivos CSV
-df_RL = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/RL/inputs/gen_build_costs.csv", DataFrame)
-df_CN = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/CN/inputs/gen_build_costs.csv", DataFrame)
-df_TA = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/TA/inputs/gen_build_costs.csv", DataFrame)
+df_RL = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/RL/inputs/gen_build_costs.csv", DataFrame)
+df_CN = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/CN/inputs/gen_build_costs.csv", DataFrame)
+df_TA = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/TA/inputs/gen_build_costs.csv", DataFrame)
 
 # Procesar cada DataFrame
 result_df_RL = process_df(df_RL)
@@ -51,8 +51,8 @@ result_df_CN = process_df(df_CN)
 result_df_TA = process_df(df_TA)
 
 # Actualizar cada archivo CSV
-update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/RL/inputs/gen_build_costs.csv", result_df_RL)
-update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/CN/inputs/gen_build_costs.csv", result_df_CN)
-update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_SinLDES/Costos_BESS_D5/TA/inputs/gen_build_costs.csv", result_df_TA)
+update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/RL/inputs/gen_build_costs.csv", result_df_RL)
+update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/CN/inputs/gen_build_costs.csv", result_df_CN)
+update_csv("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Costos_BESS_A5/TA/inputs/gen_build_costs.csv", result_df_TA)
 
 println("Los archivos CSV han sido actualizados con las proyecciones de disminución de costos en un 5% para proyectos de tecnología 'ESS'.")

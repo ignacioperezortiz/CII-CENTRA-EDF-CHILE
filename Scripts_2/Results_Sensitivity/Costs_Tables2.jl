@@ -2,7 +2,7 @@
 using CSV
 using DataFrames
 
-df_fuente = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Sin_PSP_10H/TA/outputs/cost_components.csv", DataFrame)
+df_fuente = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/outputs/cost_components.csv", DataFrame)
 
 function calculate_present_value(future_value, discount_rate, years)
     return future_value / ((1 + discount_rate) ^ years)
@@ -28,7 +28,7 @@ investment_periods = Dict(
 )
 
 # Read the CSV file into a DataFrame
-df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Sin_PSP_10H/TA/outputs/dispatch_annual_summary.csv", DataFrame)
+df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/outputs/dispatch_annual_summary.csv", DataFrame)
 
 # Initialize a dictionary to store the NPV for each energy source
 npv_dict = Dict{String, Float64}()
@@ -68,26 +68,26 @@ for energy_source in unique(df.gen_energy_source)
 end
 
 # Combine specific technologies into LDES, ESS, and Gens categories
-ldes_technologies = ["Bomb", "CAES", "TES"]
+# ldes_technologies = ["Bomb", "CAES", "TES"]
 ess_technology = "ESS"
-ess_technologys = ["Bomb", "CAES", "TES", "ESS"]
+# ess_technologys = ["Bomb", "CAES", "TES", "ESS"]
 
-ldes_npv = sum(npv_dict[tech] for tech in ldes_technologies if haskey(npv_dict, tech))
+# ldes_npv = sum(npv_dict[tech] for tech in ldes_technologies if haskey(npv_dict, tech))
 ess_npv = get(npv_dict, ess_technology, 0.0)
-gens_npv = sum(npv_dict[tech] for tech in keys(npv_dict) if !(tech in ess_technologys))
+gens_npv = sum(npv_dict[tech] for tech in keys(npv_dict) if tech != ess_technology)
 
 # Print the NPV for each category and the total NPV
-println("The NPV for LDES is $ldes_npv million USD.")
+# println("The NPV for LDES is $ldes_npv million USD.")
 println("The NPV for ESS is $ess_npv million USD.")
 println("The NPV for Gens is $gens_npv million USD.")
-println("The total NPV across all categories is $(ess_npv + gens_npv + ldes_npv) million USD.")
+println("The total NPV across all categories is $(ess_npv + gens_npv) million USD.")
 
 df_fuente.npv_cost = df_fuente.npv_cost./1000000
 
-push!(df_fuente, ("Ldes_nvp", ldes_npv))
+# push!(df_fuente, ("Ldes_nvp", ldes_npv))
 push!(df_fuente, ("ess_npv", ess_npv))
 push!(df_fuente, ("gens_npv", gens_npv))
 
 println(df_fuente)
 
-CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Sin_PSP_10H/TA/NVP_costs.csv", df_fuente)
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/NVP_costs.csv", df_fuente)
