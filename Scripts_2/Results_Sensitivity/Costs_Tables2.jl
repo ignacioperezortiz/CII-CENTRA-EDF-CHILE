@@ -2,7 +2,7 @@
 using CSV
 using DataFrames
 
-df_fuente = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/outputs/cost_components.csv", DataFrame)
+df_fuente = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/OK/Corridos/Ausencia_Diesel&GNL/TA/outputs/cost_components.csv", DataFrame)
 
 function calculate_present_value(future_value, discount_rate, years)
     return future_value / ((1 + discount_rate) ^ years)
@@ -28,7 +28,7 @@ investment_periods = Dict(
 )
 
 # Read the CSV file into a DataFrame
-df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/outputs/dispatch_annual_summary.csv", DataFrame)
+df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Ausencia_Diesel&GNL/TA/outputs/dispatch_annual_summary.csv", DataFrame)
 
 # Initialize a dictionary to store the NPV for each energy source
 npv_dict = Dict{String, Float64}()
@@ -90,4 +90,4 @@ push!(df_fuente, ("gens_npv", gens_npv))
 
 println(df_fuente)
 
-CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Entrada_Ampliacion_Transmision/TA/NVP_costs.csv", df_fuente)
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades_sinLDES/Ok/Corridos/Ausencia_Diesel&GNL/TA/NVP_costs.csv", df_fuente)
