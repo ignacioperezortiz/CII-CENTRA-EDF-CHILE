@@ -130,62 +130,71 @@ for scenario in scenarios
     data_energy = pivot_df_energy2
     data_capacity = pivot_df_capacity2
     
-    # Crear la figura y el eje con proporciones ajustadas para Storage_Energy_MWh
+    # Crear la figura y el eje para Storage_Energy_MWh
     fig_energy = Figure(size = (1000, 600))  # Aumentar el ancho de la figura
     ax_energy = Axis(fig_energy[1, 1], title = "Capacidad construida de BESS (MWh) por Duración (Scenario: $(basename(scenario)))", xlabel = "Periodo", ylabel = "Capacidad de Almacenamiento (MWh)",
                      titlesize = 24, xlabelsize = 16, ylabelsize = 16)
     
+    # Definir los periodos específicos (2024, 2026, 2029, 2030, 2031, 2033, 2040, 2050)
+    periods = [2024, 2026, 2029, 2030, 2031, 2033, 2040, 2050]
+    
     # Crear el gráfico de barras para Storage_Energy_MWh
     width = 0.2  # Ancho de cada barra (aumentado)
     for i in 1:size(data_energy, 2)
-        barplot!(ax_energy, period_energy .+ ((i - length(duration_order) / 2) * width) .+ (width / 2), data_energy[:, i], label = string(names(pivot_df_energy2)[i]), color = colors[parse(Int, names(pivot_df_energy2)[i])], width = width)
+        # Posiciones en el eje X para cada periodo
+        x_positions = 1:length(periods)
+        
+        # Graficar las barras usando posiciones en el eje X para cada año
+        barplot!(ax_energy, x_positions .+ ((i - length(duration_order) / 2) * width) .+ (width / 2), data_energy[:, i], 
+                 label = string(names(pivot_df_energy2)[i]), color = colors[parse(Int, names(pivot_df_energy2)[i])], width = width)
     end
     
     # Añadir leyenda fuera del gráfico, a la derecha y reducir el tamaño de la simbología
     legend_energy = Legend(fig_energy, ax_energy, "Simbología", title = "Duración del Almacenamiento (Horas)", fontsize = 8)
     fig_energy[1, 2] = legend_energy
     
-    # Añadir xticks de 5 en 5
-    ax_energy.xticks = 1:5:maximum(period_energy)
+    # Asignar las posiciones de los ticks del eje X usando los periodos específicos
+    ax_energy.xticks = (1:length(periods), string.(periods))  # Asignar etiquetas para los periodos sin considerar espacio entre años
     
-    # Definir los límites del eje x como el valor mínimo y máximo de los periodos a graficar, con espacio adicional
-    x_min = minimum(period_energy) - 1
-    x_max = maximum(period_energy) + 1
-    xlims!(ax_energy, x_min, x_max)
+    # Definir los límites del eje X según los valores de los periodos
+    xlims!(ax_energy, 0, length(periods) + 1)  # Limitar los valores a las posiciones de los periodos
     
     # Ajustar la posición del título del eje Y para dar más espacio a los ticks del eje Y
     ax_energy.ylabelpadding = 40
     
     # Establecer el límite inferior del eje Y siempre en 0
     ylims!(ax_energy, 0, nothing)
-
+    
     # Guardar la figura en la ruta especificada
     save(joinpath(scenario, "ess_Construction_bar_chart_storage_energy.png"), fig_energy)
     
     # Mostrar la figura
     display(fig_energy)
     
-    # Crear la figura y el eje con proporciones ajustadas para GenCapacity_MW
+    # Crear la figura y el eje para GenCapacity_MW
     fig_capacity = Figure(size = (1000, 600))  # Aumentar el ancho de la figura
     ax_capacity = Axis(fig_capacity[1, 1], title = "Capacidad construida de almacenamiento BESS (MW) por Duración (Scenario: $(basename(scenario)))", xlabel = "Periodo", ylabel = "Capacidad Instalada (MW)",
                         titlesize = 24, xlabelsize = 16, ylabelsize = 16)
     
     # Crear el gráfico de barras para GenCapacity_MW
     for i in 1:size(data_capacity, 2)
-        barplot!(ax_capacity, period_capacity .+ ((i - length(duration_order) / 2) * width) .+ (width / 2), data_capacity[:, i], label = string(names(pivot_df_capacity2)[i]), color = colors[parse(Int, names(pivot_df_capacity2)[i])], width = width)
+        # Posiciones en el eje X para cada periodo
+        x_positions = 1:length(periods)
+        
+        # Graficar las barras usando posiciones en el eje X para cada año
+        barplot!(ax_capacity, x_positions .+ ((i - length(duration_order) / 2) * width) .+ (width / 2), data_capacity[:, i], 
+                 label = string(names(pivot_df_capacity2)[i]), color = colors[parse(Int, names(pivot_df_capacity2)[i])], width = width)
     end
     
     # Añadir leyenda fuera del gráfico, a la derecha y reducir el tamaño de la simbología
     legend_capacity = Legend(fig_capacity, ax_capacity, "Simbología", title = "Duración del Almacenamiento (Horas)", fontsize = 8)
     fig_capacity[1, 2] = legend_capacity
     
-    # Añadir xticks de 5 en 5
-    ax_capacity.xticks = 1:5:maximum(period_capacity)
+    # Asignar las posiciones de los ticks del eje X usando los periodos específicos
+    ax_capacity.xticks = (1:length(periods), string.(periods))  # Asignar etiquetas para los periodos sin considerar espacio entre años
     
-    # Definir los límites del eje x como el valor mínimo y máximo de los periodos a graficar, con espacio adicional
-    x_min = minimum(period_capacity) - 1
-    x_max = maximum(period_capacity) + 1
-    xlims!(ax_capacity, x_min, x_max)
+    # Definir los límites del eje X según los valores de los periodos
+    xlims!(ax_capacity, 0, length(periods) + 1)  # Limitar los valores a las posiciones de los periodos
     
     # Ajustar la posición del título del eje Y para dar más espacio a los ticks del eje Y
     ax_capacity.ylabelpadding = 40
