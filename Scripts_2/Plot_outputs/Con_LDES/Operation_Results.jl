@@ -4,7 +4,7 @@ using CairoMakie
 using FilePathsBase
 
 # Definir la carpeta base que contiene las carpetas de los escenarios
-base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Entrada_Ampliacion_Transmision/"
+base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase/"
 
 # Obtener la lista de carpetas de escenarios
 scenarios = readdir(base_dir, join=true) |> filter(isdir)
@@ -177,17 +177,17 @@ for scenario in scenarios
             
             # Crear un gráfico de área apilada
             fig = Figure(size = (1000, 600))
-            ax = Axis(fig[1, 1], title="Dispatch Generation by Technology for $period-$day, $scenarioo", xlabel="Hour of the Day", ylabel="Dispatch (GW)")
+            ax = Axis(fig[1, 1], title="Despacho por tecnología $period-$day, $scenarioo", xlabel="Hora", ylabel="Despacho (GW)")
             for tech in reverse(names(pivot_df)[2:end])
                 fill_between!(ax, pivot_df.hour, zeros(length(pivot_df.hour)), pivot_df[!, tech] ./ 1000, label=tech, color=colors[tech])
             end
             
             # Personalizar el gráfico
             ax.xticks = 0:1:23
-            Legend(fig[1, 2], ax, "Technologies", title="Generation Technologies")
-
+            Legend(fig[1, 2], ax, "Tecnologías", title="Tecnologías de generación")
+            text!("--- : Demanda", position = (0.02, 0.98), space = :relative, align = (:left, :top), fontsize = 12)
             # Plot the line with adjusted indices and as a dashed line, also convert line to GW
-            lines!(ax, 0:23, line[1:24] ./ 1000, linestyle=:dash, color=:black, label="Demand")
+            lines!(ax, 0:23, line[1:24] ./ 1000, linestyle=:dash, color=:black, label="Demanda")
             
             # Guardar el gráfico como archivo PNG
             output_dir = joinpath(scenario, "Dispatch_Generation")

@@ -4,29 +4,31 @@ using CairoMakie
 using FilePathsBase
 
 # Definir la carpeta base que contiene las carpetas de los escenarios
-base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/"
+base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase/"
 
 # Obtener la lista de carpetas de escenarios
 scenarios = readdir(base_dir, join=true) |> filter(isdir)
 
 # Iterar sobre cada carpeta de escenario y procesar los archivos
 for scenario in scenarios
-    println("Processing scenario: $scenario")
+    println("Procesando escenario: $scenario")
     
     # Verificar si el directorio del escenario está vacío
     if isempty(readdir(scenario * "/outputs"))
-        println("Skipping empty scenario: $scenario")
+        println("Saltando escenario vacío: $scenario")
         continue
     end
     
     # Leer el archivo storage_dispatch.csv
     dispatch_file = joinpath(scenario, "outputs", "storage_dispatch.csv")
     if !isfile(dispatch_file)
-        println("Skipping missing dispatch file in scenario: $scenario")
+        println("Saltando archivo dispatch faltante en escenario: $scenario")
         continue
     end
     
     data = CSV.read(dispatch_file, DataFrame)
+
+    data = filter!(row -> !occursin("Bomb", row.generation_project), data)
     
     # Extraer el año, día y la hora de la columna timepoint
     data.year = [split(tp, "-")[1] for tp in data.timepoint]
@@ -46,9 +48,9 @@ for scenario in scenarios
         day_data = grouped[(grouped.year .== year) .& (grouped.day .== day), :]
         
         fig = Figure(resolution = (800, 1200)) # Ajustar la resolución para acomodar tres gráficos
-        ax1 = Axis(fig[1, 1], title = "State of Charge for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "State of Charge (MWh)")
-        ax2 = Axis(fig[2, 1], title = "Charge Power for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "Charge Power (MW)")
-        ax3 = Axis(fig[3, 1], title = "Discharge Power for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "Discharge Power (MW)")
+        ax1 = Axis(fig[1, 1], title = "Estado de Carga BESS para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Estado de Carga (MWh)")
+        ax2 = Axis(fig[2, 1], title = "Potencia de Carga BESS para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Carga (MW)")
+        ax3 = Axis(fig[3, 1], title = "Potencia de Descarga BESS para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Descarga (MW)")
         
         scatter!(ax1, day_data.hour, day_data.StateOfCharge_sum, marker = :circle)
         lines!(ax1, day_data.hour, day_data.StateOfCharge_sum)
@@ -74,8 +76,8 @@ for scenario in scenarios
         # Guardar la figura en la ruta especificada
         output_dir = joinpath(scenario, "Storage_operation")
         mkpath(output_dir)
-        save(joinpath(output_dir, "StateOfCharge_Charge_Discharge_$year-$day.png"), fig)
+        save(joinpath(output_dir, "EstadoDeCarga_Carga_Descarga_$year-$day.png"), fig)
     end
 end
 
-println("Processing complete.")
+println("Procesamiento completo.")

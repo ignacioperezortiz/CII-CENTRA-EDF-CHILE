@@ -5,7 +5,7 @@ using PrettyTables
 using FilePathsBase
 
 # Definir la carpeta base que contiene las carpetas de los escenarios
-base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Entrada_Ampliacion_Transmision/"
+base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Ausencia_Diesel&GNL/"
 
 # Obtener la lista de carpetas de escenarios
 scenarios = readdir(base_dir, join=true) |> filter(isdir)
@@ -136,7 +136,7 @@ for scenario in scenarios
         ylabel="Capacidad de Almacenamiento (GWh)", # GWh
         xticks=(1:length(periods), string.(periods)),
         # Establecer el límite del eje y en 50 para la energía
-        limits=(nothing, nothing, nothing, 60),
+        limits=(nothing, nothing, nothing, 140),
         titlesize=24,
         xlabelsize=16,
         ylabelsize=16)

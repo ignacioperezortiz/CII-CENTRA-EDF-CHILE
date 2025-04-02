@@ -4,25 +4,25 @@ using CairoMakie
 using FilePathsBase
 
 # Definir la carpeta base que contiene las carpetas de los escenarios
-base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Estudio_oficial/Estudio_Oficial/Nuevos_GNLMarket/"
+base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase/"
 
 # Obtener la lista de carpetas de escenarios
 scenarios = readdir(base_dir, join=true) |> filter(isdir)
 
 # Iterar sobre cada carpeta de escenario y procesar los archivos
 for scenario in scenarios
-    println("Processing scenario: $scenario")
+    println("Procesando escenario: $scenario")
     
     # Verificar si el directorio del escenario está vacío
     if isempty(readdir(scenario * "/outputs"))
-        println("Skipping empty scenario: $scenario")
+        println("Saltando escenario vacío: $scenario")
         continue
     end
     
     # Leer el archivo storage_dispatch.csv
     dispatch_file = joinpath(scenario, "outputs", "storage_dispatch.csv")
     if !isfile(dispatch_file)
-        println("Skipping missing dispatch file in scenario: $scenario")
+        println("Saltando archivo dispatch faltante en escenario: $scenario")
         continue
     end
     
@@ -49,43 +49,31 @@ for scenario in scenarios
         day_data = grouped[(grouped.year .== year) .& (grouped.day .== day), :]
         
         fig = Figure(resolution = (800, 1200))  # Ajustar la resolución para acomodar tres gráficos
-        ax1 = Axis(fig[1, 1], title = "State of Charge for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "State of Charge", ylabelsize = 10)
-        ax2 = Axis(fig[2, 1], title = "Charge Power for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "ChargeMW", ylabelsize = 10)
-        ax3 = Axis(fig[3, 1], title = "Discharge Power for $year-$day (Scenario: $(basename(scenario)))", xlabel = "Hour", ylabel = "DischargeMW", ylabelsize = 10)
+        ax1 = Axis(fig[1, 1], title = "Estado de Carga PSP para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Estado de Carga (MWh)")
+        ax2 = Axis(fig[2, 1], title = "Potencia de Carga PSP para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Carga (MW)")
+        ax3 = Axis(fig[3, 1], title = "Potencia de Descarga PSP para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Descarga (MW)")
         
         min_hour = minimum(day_data.hour)
         max_hour = maximum(day_data.hour)
         
-        # if day in ["04", "08", "12"]
-        #     # Crear un eje x de 0 a 96 con incrementos de 4 horas
-        #     x_hours = 0:4:92  # 24 elementos distribuidos cada 4 horas
-        #     scatter!(ax1, x_hours, day_data.StateOfCharge_sum, marker = :circle)
-        #     lines!(ax1, x_hours, day_data.StateOfCharge_sum)
-        #     scatter!(ax2, x_hours, day_data.ChargeMW_sum, marker = :circle, color = :green)
-        #     lines!(ax2, x_hours, day_data.ChargeMW_sum, color = :green)
-        #     scatter!(ax3, x_hours, day_data.DischargeMW_sum, marker = :circle, color = :red)
-        #     lines!(ax3, x_hours, day_data.DischargeMW_sum, color = :red)
-        # else
         scatter!(ax1, day_data.hour, day_data.StateOfCharge_sum, marker = :circle)
         lines!(ax1, day_data.hour, day_data.StateOfCharge_sum)
         scatter!(ax2, day_data.hour, day_data.ChargeMW_sum, marker = :circle, color = :green)
         lines!(ax2, day_data.hour, day_data.ChargeMW_sum, color = :green)
         scatter!(ax3, day_data.hour, day_data.DischargeMW_sum, marker = :circle, color = :red)
         lines!(ax3, day_data.hour, day_data.DischargeMW_sum, color = :red)
-
         
         xlims!(ax1, min_hour, max_hour)
         xlims!(ax2, min_hour, max_hour)
         xlims!(ax3, min_hour, max_hour)
         
         linkxaxes!(ax1, ax2, ax3)  # Compartir el eje x entre los tres gráficos
-        # display(fig)
         
         # Guardar la figura en la ruta especificada
         output_dir = joinpath(scenario, "Storage_operation")
         mkpath(output_dir)
-        save(joinpath(output_dir, "PSP-StateOfCharge_Charge_Discharge_$year-$day.png"), fig)
+        save(joinpath(output_dir, "PSP_EstadoDeCarga_Carga_Descarga_$year-$day.png"), fig)
     end
 end
 
-println("Processing complete.")
+println("Procesamiento completo.")

@@ -5,7 +5,7 @@ using PrettyTables
 using FilePathsBase
 
 # Definir la carpeta base que contiene las carpetas de los escenarios
-base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/Entrada_Ampliacion_Transmision"
+base_dir = "C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sensibilidades/OK/Corridos/CasoBase"
 
 # Obtener la lista de carpetas de escenarios
 scenarios = readdir(base_dir, join=true) |> filter(isdir)
@@ -104,7 +104,7 @@ for scenario in scenarios
     # Crear las figuras para las gráficas apiladas
     fig = Figure(size = (1000, 600))
     ax = Axis(fig[1, 1],
-        title = "Capacidad Instalada Total (GW) por Año (Escenario: $(basename(scenario)))",
+        title = "Capacidad Instalada Total (GW) por Periodo (Escenario: $(basename(scenario)))",
         xlabel = "Periodo",
         ylabel = "Capacidad Instalada (GW)",
         xticks = (1:length(periods), string.(periods)),
@@ -139,7 +139,7 @@ for scenario in scenarios
     # Crear la leyenda con colores correctos
     Legend(fig[1, 2],
         [PolyElement(color = colors[tech]) for tech in unique_techs],
-        string.("Tecnología: ", unique_techs);
+        string.(" ", unique_techs);
         labelcolor = :black,
         labelsize = 12,
         titlecolor = :black,
