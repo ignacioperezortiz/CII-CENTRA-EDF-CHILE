@@ -14,9 +14,9 @@ df_Bajo.fuel = string.(df_Bajo.fuel)
 # Función para filtrar por combustible y calcular el promedio por año
 function get_avg_cost_by_fuel(df::DataFrame, fuel_type::String15)
     # Filtramos las filas que coinciden con el tipo de combustible
-    filtered_df = filter(row -> strip(row.fuel) == fuel_type, df)  # Filtramos por combustible
-    avg_cost_by_year = groupby(filtered_df, :period)  # Agrupar por año
-    return combine(avg_cost_by_year, :fuel_cost => mean)  # Calcular el promedio de los costos
+    filtered_df = filter(row -> strip(row.fuel) == fuel_type, df)
+    avg_cost_by_year = groupby(filtered_df, :period)
+    return combine(avg_cost_by_year, :fuel_cost => mean)
 end
 
 fuel_types = unique(vcat(df_Alto.fuel, df_Medio.fuel, df_Bajo.fuel))
@@ -25,7 +25,7 @@ results = Dict()
 
 # Obtener el promedio para cada combustible y escenario
 for fuel_type in fuel_types
-    println("Procesando combustible: $fuel_type")  
+    println("Procesando combustible: $fuel_type")
     results[fuel_type] = Dict(
         "Alto" => get_avg_cost_by_fuel(df_Alto, fuel_type),
         "Medio" => get_avg_cost_by_fuel(df_Medio, fuel_type),
@@ -34,20 +34,49 @@ for fuel_type in fuel_types
 end
 
 # Función para graficar los resultados
-function plot_fuel_costs(fuel_type::String15, data::Dict)
+function plot_fuel_costs(fuel_type::String15, data::Dict, ruta_guardado::String)
     years = unique(vcat(data["Alto"].period, data["Medio"].period, data["Bajo"].period))
     
     alto_cost = data["Alto"].fuel_cost_mean
     medio_cost = data["Medio"].fuel_cost_mean
     bajo_cost = data["Bajo"].fuel_cost_mean
     
+    # Determinar la etiqueta del eje y según el tipo de combustible
+    ylabel_text = ""
+    if fuel_type in ["Biomasa", "Carbon"]
+        ylabel_text = "Costo Promedio USD/Ton"
+    elseif fuel_type in ["Cogeneracion", "GNL", "Biogas"]
+        ylabel_text = "Costo Promedio USD/MMBtu"
+    elseif fuel_type == "Diesel"
+        ylabel_text = "Costo Promedio USD/m3"
+    else
+        ylabel_text = "Costo Promedio" # Etiqueta por defecto si no coincide
+    end
+    
     # Crear el gráfico para cada tipo de combustible
-    plot(years, alto_cost, label="Alto", xlabel="Año", ylabel="Costo Promedio USD/Ton",  title="Costo de Combustible: $fuel_type", linestyle=:solid, linewidth=3, color=:red)
-    plot!(years, medio_cost, label="Medio", linestyle=:solid, linewidth=3, color=:blue)
-    plot!(years, bajo_cost, label="Bajo", linestyle=:solid, linewidth=3, color=:green)
-    return plot!()
+    p = plot(years, alto_cost, label="Alto", xlabel="Año", ylabel=ylabel_text, title="Costo de Combustible: $fuel_type", linestyle=:solid, linewidth=3, color=:red)
+    plot!(p, years, medio_cost, label="Medio", linestyle=:solid, linewidth=3, color=:blue)
+    plot!(p, years, bajo_cost, label="Bajo", linestyle=:solid, linewidth=3, color=:green)
+    
+    # Guardar el gráfico como PNG
+    savefig(p, joinpath(ruta_guardado, "costo_combustible_$fuel_type.png"))
+    
+    return p
 end
 
+# Mostrar los gráficos y guardar los archivos CSV
+ruta_guardado = "C:\\Users\\Ignac\\Trabajo_Centra\\Catedra-LDES\\CII-Centra-EDF\\SEN\\SEN-Files\\Electricity Generation\\CII-CENTRA-EDF-CHILE\\Estudio_Sensibilidades" # Especifica la ruta de guardado
 for (fuel_type, data) in results
-    display(plot_fuel_costs(fuel_type, data))
+    # Guardar los gráficos en la misma ruta
+    plot_fuel_costs(fuel_type, data, ruta_guardado)
+    
+    # Crear un DataFrame para los datos del combustible
+    df_combustible = DataFrame(
+        Año = data["Alto"].period,
+        Alto = data["Alto"].fuel_cost_mean,
+        Medio = data["Medio"].fuel_cost_mean,
+        Bajo = data["Bajo"].fuel_cost_mean
+    )
+    # Guardar el DataFrame como archivo CSV
+    CSV.write(joinpath(ruta_guardado, "costos_combustible_$fuel_type.csv"), df_combustible)
 end

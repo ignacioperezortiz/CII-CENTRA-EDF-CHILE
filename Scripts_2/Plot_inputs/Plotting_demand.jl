@@ -9,6 +9,12 @@ df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN
 escenarios = ["transicion_acelerada", "rumbo_CN", "recuperacion_lenta"]
 df_demanda_total = DataFrame(year=Int[], demanda_total=Float64[], escenario=String[])
 
+disminucion_porcentaje = 0.08  # 8% de disminución
+factor_original = 1.0
+factor_disminuido = factor_original - disminucion_porcentaje
+incremento_necesario = (factor_original / factor_disminuido) - 1
+incremento_porcentaje = incremento_necesario + 1
+
 # Función para calcular la demanda total por año para un escenario
 function calcular_demanda_por_escenario(escenario, df)
     df_filtrado = filter(row -> row.scenario == escenario, df)
@@ -42,14 +48,14 @@ demanda_total_formateada = [parse.(Int, @sprintf("%d", d)) for d in df_demanda_t
 
 p = plot()
 
-plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "transicion_acelerada"], demanda_total_formateada[df_demanda_total.escenario .== "transicion_acelerada"], 
-      label="Transición Acelerada", linewidth=2, color=:blue, markershape=:circle)
+plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "transicion_acelerada"], demanda_total_formateada[df_demanda_total.escenario .== "transicion_acelerada"]*incremento_porcentaje, 
+      label="Alta", linewidth=2, color=:blue, markershape=:circle)
 
-plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "rumbo_CN"], demanda_total_formateada[df_demanda_total.escenario .== "rumbo_CN"], 
-      label="Rumbo CN", linewidth=2, color=:green, markershape=:circle)
+plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "rumbo_CN"], demanda_total_formateada[df_demanda_total.escenario .== "rumbo_CN"]*incremento_porcentaje, 
+      label="Media alta", linewidth=2, color=:green, markershape=:circle)
 
-plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "recuperacion_lenta"], demanda_total_formateada[df_demanda_total.escenario .== "recuperacion_lenta"], 
-      label="Recuperación Lenta", linewidth=2, color=:red, markershape=:circle)
+plot!(p, df_demanda_total.year[df_demanda_total.escenario .== "recuperacion_lenta"], demanda_total_formateada[df_demanda_total.escenario .== "recuperacion_lenta"]*incremento_porcentaje, 
+      label="Conservadora", linewidth=2, color=:red, markershape=:circle)
 
 xlabel!("Año")
 ylabel!("Demanda Total del Sistema TWh")
