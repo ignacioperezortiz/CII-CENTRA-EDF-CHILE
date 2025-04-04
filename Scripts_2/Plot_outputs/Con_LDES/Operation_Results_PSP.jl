@@ -54,14 +54,14 @@ for scenario in scenarios
         ax3 = Axis(fig[3, 1], title = "Potencia de Descarga PSP para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Descarga (MW)")
         
         min_hour = minimum(day_data.hour)
-        max_hour = maximum(day_data.hour)
+        max_hour = maximum(day_data.hour.*4)
         
-        scatter!(ax1, day_data.hour, day_data.StateOfCharge_sum, marker = :circle)
-        lines!(ax1, day_data.hour, day_data.StateOfCharge_sum)
-        scatter!(ax2, day_data.hour, day_data.ChargeMW_sum, marker = :circle, color = :green)
-        lines!(ax2, day_data.hour, day_data.ChargeMW_sum, color = :green)
-        scatter!(ax3, day_data.hour, day_data.DischargeMW_sum, marker = :circle, color = :red)
-        lines!(ax3, day_data.hour, day_data.DischargeMW_sum, color = :red)
+        scatter!(ax1, day_data.hour.*4, day_data.StateOfCharge_sum, marker = :circle)
+        lines!(ax1, day_data.hour.*4, day_data.StateOfCharge_sum)
+        scatter!(ax2, day_data.hour.*4, day_data.ChargeMW_sum, marker = :circle, color = :green)
+        lines!(ax2, day_data.hour.*4, day_data.ChargeMW_sum, color = :green)
+        scatter!(ax3, day_data.hour.*4, day_data.DischargeMW_sum, marker = :circle, color = :red)
+        lines!(ax3, day_data.hour.*4, day_data.DischargeMW_sum, color = :red)
         
         xlims!(ax1, min_hour, max_hour)
         xlims!(ax2, min_hour, max_hour)

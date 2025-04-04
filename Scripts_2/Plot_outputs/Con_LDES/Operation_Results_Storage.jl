@@ -52,16 +52,16 @@ for scenario in scenarios
         ax2 = Axis(fig[2, 1], title = "Potencia de Carga BESS para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Carga (MW)")
         ax3 = Axis(fig[3, 1], title = "Potencia de Descarga BESS para $year-$day (Escenario: $(basename(scenario)))", xlabel = "Hora", ylabel = "Potencia de Descarga (MW)")
         
-        scatter!(ax1, day_data.hour, day_data.StateOfCharge_sum, marker = :circle)
-        lines!(ax1, day_data.hour, day_data.StateOfCharge_sum)
-        scatter!(ax2, day_data.hour, day_data.ChargeMW_sum, marker = :circle, color = :green)
-        lines!(ax2, day_data.hour, day_data.ChargeMW_sum, color = :green)
-        scatter!(ax3, day_data.hour, day_data.DischargeMW_sum, marker = :circle, color = :red)
-        lines!(ax3, day_data.hour, day_data.DischargeMW_sum, color = :red)
+        scatter!(ax1, day_data.hour.*4, day_data.StateOfCharge_sum, marker = :circle)
+        lines!(ax1, day_data.hour.*4, day_data.StateOfCharge_sum)
+        scatter!(ax2, day_data.hour.*4, day_data.ChargeMW_sum, marker = :circle, color = :green)
+        lines!(ax2, day_data.hour.*4, day_data.ChargeMW_sum, color = :green)
+        scatter!(ax3, day_data.hour.*4, day_data.DischargeMW_sum, marker = :circle, color = :red)
+        lines!(ax3, day_data.hour.*4, day_data.DischargeMW_sum, color = :red)
         
         # Definir los límites del eje x como el valor mínimo y máximo de las horas a graficar
         x_min = minimum(day_data.hour)
-        x_max = maximum(day_data.hour)
+        x_max = maximum(day_data.hour.*4)
         xlims!(ax1, x_min, x_max)
         xlims!(ax2, x_min, x_max)
         xlims!(ax3, x_min, x_max)
