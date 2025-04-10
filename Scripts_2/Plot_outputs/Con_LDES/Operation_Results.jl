@@ -181,7 +181,7 @@ for scenario in scenarios
             for tech in reverse(names(pivot_df)[2:end])
                 fill_between!(ax, pivot_df.hour, zeros(length(pivot_df.hour)), pivot_df[!, tech] ./ 1000, label=tech, color=colors[tech])
             end
-            
+            #
             # Personalizar el gráfico
             ax.xticks = 0:1:23
             Legend(fig[1, 2], ax, "Tecnologías", title="Tecnologías de generación")
