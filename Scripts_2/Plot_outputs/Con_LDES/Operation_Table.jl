@@ -2,13 +2,8 @@ using CSV
 using DataFrames
 using Dates
 
-# Leer el archivo de demanda
-df = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/demanda.csv", DataFrame)
-escenarios = ["transicion_acelerada", "rumbo_TA", "recuperacion_lenta"]
-df_demanda_total = DataFrame(year=Int[], demanda_total=Float64[], escenario=String[])
-
-# Mostrar la demanda total por año
-# println(df_demanda_total)
+Directorys = ["CasoBase","Ausencia_Diesel&GNL","BESS_Construccion_Masiva","BESS_Construccion_Masiva2","Biomasa_reconversion","Costos_BESS_A5","Costos_BESS_D5","Costos_GNL_A5","Costos_GNL_D5","Entrada_Ampliacion_Transmision","PSP_2029","PSP_2033","Sin_PSP_10H"]
+Scenarios = ["RL","CN","TA"]
 
 # Crear el DataFrame inicial
 items = ["Potencia no servida", "Recortes", "Recortes %", "Emisiones CO2 anual (MM)", "Energía movida por BESS anual",
@@ -23,7 +18,7 @@ for year in ["2024", "2026", "2029", "2030", "2031", "2033", "2040", "2050"]
 end
 
 # Llenar la fila "Energía total demandada (GWh)" con 
-df_demanda = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/electricity_cost.csv", DataFrame)
+df_demanda = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/outputs/electricity_cost.csv", DataFrame)
 for row in eachrow(df_demanda)
     period = string(row.PERIOD)
     if period in names(df)
@@ -36,7 +31,7 @@ end
 # println(df)
 
 # Llenar columna Emisiones CO2 anual
-Emissions_DF = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/emissions.csv", DataFrame)
+Emissions_DF = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/outputs/emissions.csv", DataFrame)
 
 # Asignar valores de Emissions_DF a df
 for row in eachrow(Emissions_DF)
@@ -50,7 +45,7 @@ end
 # println(df)
 
 # Llenar columna Energía movida por BESS
-dispatch_annual_summary = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/dispatch_annual_summary.csv", DataFrame)
+dispatch_annual_summary = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/outputs/dispatch_annual_summary.csv", DataFrame)
 
 # Filtrar el DataFrame para obtener solo las filas donde gen_tech es "ESS"
 filtered_dispatch = filter(row -> row.gen_tech == "ESS", dispatch_annual_summary)
@@ -165,9 +160,17 @@ for period in unique(filtered_dispatch6.period)
 end
 
 # Lectura de archivos
-df_dispatch = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/DispatchGen.csv", DataFrame)
-df_limits = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/variable_capacity_factors.csv", DataFrame)
-df_genbuild = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/outputs/dispatch_gen_annual_summary.csv", DataFrame)
+df_dispatch = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/outputs/DispatchGen.csv", DataFrame)
+df_limits = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/inputs/variable_capacity_factors.csv", DataFrame)
+df_genbuild = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/outputs/dispatch_gen_annual_summary.csv", DataFrame)
+
+# Trabajo de archivo df_genbuild para cambiar el nombred e un generador
+for row in eachrow(df_genbuild)
+    if row[:generation_project] == "Las AraÃ±as 1 13.2 II"
+        row[:generation_project] = "Las Arañas 1 13.2 II"
+        row[:gen_dbid] = "Las Arañas 1 13.2 II" # Modifica también la columna gen_dbid
+    end
+end
 
 # Trabajo de archivo dispatch para que solo hayan renovables variables
 unicue = unique(df_limits.GENERATION_PROJECT)
@@ -245,7 +248,7 @@ df_potencial_generacion_totales[:, :GEN_TPS_2] = [string(row[:año]) * lpad(stri
 
 # df_recortes_diarios
 # Leer el archivo timeseries.csv
-df_timeseries = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/inputs/timeseries.csv", DataFrame)
+df_timeseries = CSV.read("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/inputs/timeseries.csv", DataFrame)
 # df_timeseries[:, :TIMESERIES] = string.(df_timeseries[:, :TIMESERIES])
 # Crear una nueva columna en df_recortes_diarios para ts_scale_to_period
 df_recortes_diarios[:, :ts_scale_to_period] = Vector{Float64}(undef, nrow(df_recortes_diarios))
@@ -318,4 +321,4 @@ end
 
 println(df)
 
-CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/SEN/SEN-Files/Electricity Generation/Reference_NDC/Tabla_Resultados_Energeticos.csv", df)
+CSV.write("C:/Users/Ignac/Trabajo_Centra/Catedra-LDES/CII-Centra-EDF/Estudio_Oficial/Sinsib/Sensibilidades/OK/Corridos/CasoBase/TA/Tabla_Resultados_Energeticos.csv", df)
