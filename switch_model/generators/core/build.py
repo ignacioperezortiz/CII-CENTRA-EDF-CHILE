@@ -278,7 +278,7 @@ def define_components(mod):
     use that for subsequent lookups, and clean up at the last call."""
 
     # definir acá tambíen un parametro: porcentaje de aporte de cada generador en demanda peak. 
-    mod.peak_demand_gen_max_percent = Param(mod.GENERATION_PROJECTS, within=PercentFraction)    # new
+    mod.peak_demand_gen_max_percent = Param(mod.GENERATION_PROJECTS, within=PercentFraction, default=1)    # new
 
     def GENS_IN_ZONE_init(m, z):
         if not hasattr(m, "GENS_IN_ZONE_dict"):
