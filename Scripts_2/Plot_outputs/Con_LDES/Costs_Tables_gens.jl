@@ -1,4 +1,3 @@
-# Script para generar un vector con un resumen de costos totales de planificación para cada escenario, diferenciado por item
 using CSV
 using DataFrames
 
@@ -42,39 +41,45 @@ gens_tec_dict=Dict{String, String}()
 for gen in generators
     # Filter the DataFrame for the current energy source
     df_filtered = df[df.generation_project .== gen, :]
-    
+
     # Initialize the total NPV for the current energy source
     total_npv = 0.0
-    
+
     # Iterate over each row in the filtered DataFrame
     for row in eachrow(df_filtered)
         period = row[:period]
         gen_capital_costs = row[:GenCapitalCosts]
         gen_fixed_om_costs = row[:GenFixedOMCosts]
-        
+
         # Calculate the annuity value at the start of the investment period for GenCapitalCosts
         annuity_value_capital = calculate_annuity_value(gen_capital_costs, discount_rate, investment_periods[period])
-        
+
         # Calculate the annuity value at the start of the investment period for GenFixedOMCosts
         annuity_value_fixed_om = calculate_annuity_value(gen_fixed_om_costs, discount_rate, investment_periods[period])
-        
+
         # Calculate the present value of the annuity value at the base year (2024) for GenCapitalCosts
         present_value_capital = calculate_present_value(annuity_value_capital, discount_rate, period - 2024)
-        
+
         # Calculate the present value of the annuity value at the base year (2024) for GenFixedOMCosts
         present_value_fixed_om = calculate_present_value(annuity_value_fixed_om, discount_rate, period - 2024)
-        
+
         # Add the present values to the total NPV for the current energy source
         total_npv += present_value_capital + present_value_fixed_om
     end
-    
+
     # Store the total NPV for the current energy source in the dictionary
     npv_dict[gen] = total_npv / 1000000
-    if df_filtered.gen_energy_source[1] in ldes_technologies
+    if !isempty(df_filtered) && df_filtered.gen_energy_source[1] in ldes_technologies
         gens_tec_dict[gen] = "LDES"
     else
         gens_tec_dict[gen] = "OTHER"
     end
 end
-npv_dict
-gens_tec_dict
+
+# Filter npv_dict to only include generators where gens_tec_dict is "LDES"
+ldes_npv_dict = Dict(gen => npv for (gen, npv) in npv_dict if get(gens_tec_dict, gen, "") == "LDES")
+
+# Filter ldes_npv_dict to only include generators where the NPV is not zero
+non_zero_ldes_npv_dict = Dict(gen => npv for (gen, npv) in ldes_npv_dict if npv != 0)
+
+non_zero_ldes_npv_dict
